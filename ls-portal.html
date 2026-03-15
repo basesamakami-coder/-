@@ -231,13 +231,9 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
   background: #f0e8d8; border: none; border-radius: 13px;
   color: #8a7a6a; font-size: 14px; padding: 14px 16px; cursor: pointer;
 }
-#modal-del-btn {
-  background: #fff0f0; border: 1.5px solid #ffaaaa; border-radius: 13px;
-  color: #cc4444; font-size: 14px; padding: 14px 16px;
-  cursor: pointer; display: none;
-}
+#modal-del-btn { display: none; }
 
-/* 日付詳細 */
+/* 日付詳細（カレンダー） */
 .day-event-row {
   display: flex; align-items: center; gap: 12px;
   background: #f5ede0; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
@@ -245,9 +241,45 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 }
 .day-event-row:active { background: #fff4d8; }
 .day-event-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-.day-event-info {}
 .day-event-name { font-size: 15px; font-weight: 800; }
 .day-event-cat  { font-size: 11px; color: #8a7a6a; margin-top: 2px; }
+
+/* ===== スケジュール詳細モーダル ===== */
+.detail-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.detail-event-date { font-size: 13px; color: #8a7a6a; font-weight: 600; }
+
+.detail-sec-title {
+  font-size: 10px; font-weight: 800; color: #b8996a; letter-spacing: 1.5px;
+  margin: 16px 0 6px; padding-bottom: 5px; border-bottom: 1px solid #f0e8d8;
+}
+.detail-row {
+  display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid #f8f2eb; align-items: flex-start;
+}
+.detail-row:last-of-type { border-bottom: none; }
+.detail-icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; margin-top: 1px; }
+.detail-content { flex: 1; }
+.detail-label { font-size: 10px; font-weight: 800; color: #b8996a; margin-bottom: 3px; }
+.detail-value { font-size: 14px; color: #2d2416; line-height: 1.6; white-space: pre-wrap; }
+.detail-empty {
+  text-align: center; color: #c8bfb0; font-size: 13px; padding: 24px 0 8px;
+  line-height: 1.8;
+}
+.map-btn {
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 7px;
+  background: #4a90e2; color: #fff; border-radius: 9px;
+  padding: 7px 14px; font-size: 12px; font-weight: 800;
+  text-decoration: none; border: none; cursor: pointer;
+}
+.map-btn:active { opacity: 0.8; }
+.detail-del-row {
+  margin-top: 16px; padding-top: 12px; border-top: 1px solid #f0e8d8; text-align: right;
+}
+.detail-del-btn {
+  background: none; border: 1.5px solid #ffaaaa; border-radius: 9px;
+  color: #cc4444; font-size: 12px; font-weight: 700; padding: 7px 16px; cursor: pointer;
+}
 
 @media (max-width: 480px) {
   .next-grid { grid-template-columns: repeat(2, 1fr); }
@@ -338,8 +370,7 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
     <p id="modal-desc"></p>
     <div id="modal-body"></div>
     <div class="modal-btns">
-      <button id="modal-save-btn" onclick="saveModal()">保存</button>
-      <button id="modal-del-btn"  onclick="deleteSchedule()">削除</button>
+      <button id="modal-save-btn" onclick="saveModal()">追加</button>
       <button id="modal-close-btn" onclick="closeModal()">閉じる</button>
     </div>
   </div>
@@ -568,7 +599,7 @@ function jumpToCategory(cat) {
   renderCalendar();
 }
 
-// ===== 日付詳細モーダル =====
+// ===== 日付詳細モーダル（カレンダーから） =====
 function openDayDetail(iso, events) {
   modalMode = "day-detail";
   var p = iso.match(/(\d{4})-(\d{2})-(\d{2})/);
@@ -590,15 +621,11 @@ function openDayDetail(iso, events) {
       '<div class="day-event-name">' + escH(s.name) + '</div>' +
       '<div class="day-event-cat">' + catLabel(s.category) + '</div>';
     row.appendChild(dot); row.appendChild(info);
-    // 長押しで編集
-    var pt = null;
-    row.ontouchstart = function(){ pt = setTimeout(function(){ pt=null; closeModal(); openEditSchedule(s); }, 700); };
-    row.ontouchend   = function(){ if(pt){ clearTimeout(pt); pt=null; } };
+    row.onclick = function(){ closeModal(); openScheduleDetail(s); };
     body.appendChild(row);
   });
 
   document.getElementById("modal-save-btn").style.display = "none";
-  document.getElementById("modal-del-btn").style.display = "none";
   showModal();
 }
 
@@ -659,39 +686,115 @@ function renderScheduleList() {
       right.appendChild(badge); right.appendChild(arrow);
 
       el.appendChild(bar); el.appendChild(info); el.appendChild(right);
-      el.onclick = function(){ openEditSchedule(s); };
+      el.onclick = function(){ openScheduleDetail(s); };
 
       list.appendChild(el);
     });
   });
 }
 
-// ===== スケジュール追加・編集モーダル =====
+// ===== スケジュール詳細モーダル =====
+function openScheduleDetail(s) {
+  modalMode = "detail";
+  editingId = s.id;
+  var cat = s.category || "other";
+  var iso = normISO(s.date);
+
+  document.getElementById("modal-title").textContent = s.name;
+  document.getElementById("modal-desc").textContent = "";
+  document.getElementById("modal-body").innerHTML = buildDetailHTML(s, iso, cat);
+  document.getElementById("modal-save-btn").style.display = "none";
+  showModal();
+}
+
+function buildDetailHTML(s, iso, cat) {
+  var html = "";
+
+  // ヘッダー（カテゴリバッジ＋日付）
+  html += '<div class="detail-header">';
+  html += '<span class="cat-badge ' + catCls(cat) + '">' + catLabel(cat) + '</span>';
+  html += '<span class="detail-event-date">' + isoToReadable(iso) + '</span>';
+  html += '</div>';
+
+  var hasRequired = s.startTime || s.endTime || s.placeName || s.items || s.fee;
+  var hasExtra    = s.vibe || s.members || s.meetingPoint;
+  var hasHurdle   = s.lateOk || s.rain;
+
+  if (!hasRequired && !hasExtra && !hasHurdle) {
+    html += '<div class="detail-empty">詳細情報はまだ入力されていません。<br>スプレッドシートから追記できます。</div>';
+    html += '<div class="detail-del-row"><button class="detail-del-btn" onclick="confirmDelete()">このスケジュールを削除</button></div>';
+    return html;
+  }
+
+  // ── 必須情報 ──
+  if (hasRequired) {
+    html += '<div class="detail-sec-title">必須情報</div>';
+    if (s.startTime || s.endTime) {
+      html += detailRow("🕐", "日時", (s.startTime || "—") + "　〜　" + (s.endTime || "—"));
+    }
+    if (s.placeName) {
+      var placeVal = escH(s.placeName);
+      if (s.placeUrl) {
+        var mapUrl = /^https?:\/\//.test(s.placeUrl)
+          ? s.placeUrl
+          : "https://maps.google.com/?q=" + encodeURIComponent(s.placeUrl);
+        placeVal += '<br><a href="' + mapUrl + '" target="_blank" class="map-btn">📍 マップで開く</a>';
+      }
+      html += detailRow("📍", "場所", placeVal, true);
+    }
+    if (s.items) html += detailRow("🎒", "持ち物・服装", s.items);
+    if (s.fee)   html += detailRow("💴", "参加費", s.fee);
+  }
+
+  // ── 参加情報 ──
+  if (hasExtra) {
+    html += '<div class="detail-sec-title">参加情報</div>';
+    if (s.vibe)         html += detailRow("🌟", "雰囲気", s.vibe);
+    if (s.members)      html += detailRow("👥", "参加予定メンバー", s.members);
+    if (s.meetingPoint) html += detailRow("🚩", "集合場所", s.meetingPoint);
+  }
+
+  // ── 参加しやすくするために ──
+  if (hasHurdle) {
+    html += '<div class="detail-sec-title">参加しやすくするために</div>';
+    if (s.lateOk) html += detailRow("🔄", "途中参加・途中退出", s.lateOk);
+    if (s.rain)   html += detailRow("☔", "雨天時の対応", s.rain);
+  }
+
+  html += '<div class="detail-del-row"><button class="detail-del-btn" onclick="confirmDelete()">このスケジュールを削除</button></div>';
+  return html;
+}
+
+function detailRow(icon, label, value, isHtml) {
+  var val = isHtml ? value : escH(value);
+  return '<div class="detail-row">' +
+    '<div class="detail-icon">' + icon + '</div>' +
+    '<div class="detail-content">' +
+      '<div class="detail-label">' + label + '</div>' +
+      '<div class="detail-value">' + val + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function confirmDelete() {
+  if (!confirm("このスケジュールを削除しますか？")) return;
+  schedules = schedules.filter(function(s){ return s.id !== editingId; });
+  saveLocal(); renderAll(); closeModal();
+  postToGAS({ action: "deleteSchedule", id: editingId });
+}
+
+// ===== スケジュール追加モーダル =====
 function openAddSchedule() {
   modalMode = "add";
   editingId = null;
   selectedCat = "baseball";
   document.getElementById("modal-title").textContent = "＋ スケジュール追加";
-  document.getElementById("modal-desc").textContent = "日付・ジャンル・活動名を入力してください。";
+  document.getElementById("modal-desc").textContent = "基本情報を入力してください。詳細はスプレッドシートで追記できます。";
   document.getElementById("modal-body").innerHTML = buildSchedForm(todayDisplay(), "");
   document.getElementById("modal-save-btn").textContent = "追加";
   document.getElementById("modal-save-btn").style.display = "";
-  document.getElementById("modal-del-btn").style.display = "none";
   showModal();
   setTimeout(function(){ document.getElementById("sched-name").focus(); }, 150);
-}
-
-function openEditSchedule(s) {
-  modalMode = "edit";
-  editingId = s.id;
-  selectedCat = s.category || "other";
-  document.getElementById("modal-title").textContent = "✏️ スケジュール編集";
-  document.getElementById("modal-desc").textContent = "内容を変更して「更新」を押してください。";
-  document.getElementById("modal-body").innerHTML = buildSchedForm(isoToSlash(normISO(s.date)), s.name);
-  document.getElementById("modal-save-btn").textContent = "更新";
-  document.getElementById("modal-save-btn").style.display = "";
-  document.getElementById("modal-del-btn").style.display = "";
-  showModal();
 }
 
 function buildSchedForm(date, name) {
@@ -723,37 +826,15 @@ function selectCat(cat) {
 }
 
 function saveModal() {
-  if (modalMode === "add" || modalMode === "edit") {
+  if (modalMode === "add") {
     var date = parseDate(document.getElementById("sched-date").value);
     var name = document.getElementById("sched-name").value.trim();
     if (!date || !name) { alert("日付（YYYY/MM/DD）と活動名を入力してください"); return; }
-
-    if (modalMode === "add") {
-      var newS = { id: String(Date.now()), date: date, name: name, category: selectedCat };
-      schedules.push(newS);
-      saveLocal();
-      renderAll();
-      closeModal();
-      postToGAS({ action: "addSchedule", schedule: newS });
-    } else {
-      var s = schedules.find(function(x){ return x.id === editingId; });
-      if (s) { s.date = date; s.name = name; s.category = selectedCat; }
-      saveLocal();
-      renderAll();
-      closeModal();
-      postToGAS({ action: "updateSchedule", schedule: s });
-    }
+    var newS = { id: String(Date.now()), date: date, name: name, category: selectedCat };
+    schedules.push(newS);
+    saveLocal(); renderAll(); closeModal();
+    postToGAS({ action: "addSchedule", schedule: newS });
   }
-}
-
-function deleteSchedule() {
-  if (!confirm("このスケジュールを削除しますか？")) return;
-  var id = editingId;
-  schedules = schedules.filter(function(s){ return s.id !== id; });
-  saveLocal();
-  renderAll();
-  closeModal();
-  postToGAS({ action: "deleteSchedule", id: id });
 }
 
 function saveLocal() {
@@ -776,7 +857,6 @@ function showModal() { document.getElementById("modal-overlay").classList.add("s
 function closeModal() {
   document.getElementById("modal-overlay").classList.remove("show");
   document.getElementById("modal-save-btn").style.display = "";
-  document.getElementById("modal-del-btn").style.display = "none";
 }
 function onOverlayClick(e) { if (e.target === document.getElementById("modal-overlay")) closeModal(); }
 

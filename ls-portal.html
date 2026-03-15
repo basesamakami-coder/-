@@ -717,10 +717,10 @@ function buildDetailHTML(s, iso, cat) {
   html += '</div>';
 
   var hasRequired = s.startTime || s.endTime || s.placeName || s.items || s.fee;
-  var hasExtra    = s.vibe || s.members || s.meetingPoint;
-  var hasHurdle   = s.lateOk || s.rain;
+  var hasExtra  = s.vibe || s.meetingPoint;
+  var hasNotes  = !!s.notes;
 
-  if (!hasRequired && !hasExtra && !hasHurdle) {
+  if (!hasRequired && !hasExtra && !hasNotes) {
     html += '<div class="detail-empty">詳細情報はまだ入力されていません。<br>スプレッドシートから追記できます。</div>';
     html += '<div class="detail-del-row"><button class="detail-del-btn" onclick="confirmDelete()">このスケジュールを削除</button></div>';
     return html;
@@ -750,15 +750,13 @@ function buildDetailHTML(s, iso, cat) {
   if (hasExtra) {
     html += '<div class="detail-sec-title">参加情報</div>';
     if (s.vibe)         html += detailRow("🌟", "雰囲気", s.vibe);
-    if (s.members)      html += detailRow("👥", "参加予定メンバー", s.members);
     if (s.meetingPoint) html += detailRow("🚩", "集合場所", s.meetingPoint);
   }
 
-  // ── 参加しやすくするために ──
-  if (hasHurdle) {
-    html += '<div class="detail-sec-title">参加しやすくするために</div>';
-    if (s.lateOk) html += detailRow("🔄", "途中参加・途中退出", s.lateOk);
-    if (s.rain)   html += detailRow("☔", "雨天時の対応", s.rain);
+  // ── 備考 ──
+  if (hasNotes) {
+    html += '<div class="detail-sec-title">備考</div>';
+    html += detailRow("📝", "備考", s.notes);
   }
 
   html += '<div class="detail-del-row"><button class="detail-del-btn" onclick="confirmDelete()">このスケジュールを削除</button></div>';

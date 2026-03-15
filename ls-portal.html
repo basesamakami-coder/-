@@ -47,7 +47,7 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 }
 .section-label::before { content: ""; display: block; width: 3px; height: 12px; background: #f0a500; border-radius: 2px; }
 
-.next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 22px; }
+.next-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 22px; }
 .next-card {
   background: #fff; border: 2px solid #e8ddd0; border-radius: 14px;
   padding: 12px 8px 10px; text-align: center; cursor: pointer;
@@ -58,12 +58,14 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
   content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
 }
 .next-card.c-baseball::before { background: #4a90e2; }
+.next-card.c-match::before    { background: #e53935; }
 .next-card.c-event::before    { background: #e8528a; }
 .next-card.c-camp::before     { background: #f0a500; }
 .next-card:active { opacity: 0.85; }
 .nc-icon { font-size: 20px; margin-bottom: 4px; }
 .nc-cat  { font-size: 10px; font-weight: 800; margin-bottom: 6px; }
 .nc-cat.c-baseball { color: #4a90e2; }
+.nc-cat.c-match    { color: #e53935; }
 .nc-cat.c-event    { color: #e8528a; }
 .nc-cat.c-camp     { color: #c07800; }
 .nc-date { font-size: 10px; color: #b8996a; font-weight: 600; min-height: 14px; }
@@ -127,6 +129,7 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 .cal-dots { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; padding: 0 1px; }
 .cal-dot { width: 6px; height: 6px; border-radius: 50%; }
 .cal-dot.c-baseball { background: #4a90e2; }
+.cal-dot.c-match    { background: #e53935; }
 .cal-dot.c-event    { background: #e8528a; }
 .cal-dot.c-camp     { background: #f0a500; }
 .cal-dot.c-other    { background: #aaa; }
@@ -147,6 +150,7 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 .sch-item:active { background: #fff8e8; border-color: #f0a500; }
 .sch-color-bar { width: 4px; height: 38px; border-radius: 2px; flex-shrink: 0; }
 .sch-color-bar.c-baseball { background: #4a90e2; }
+.sch-color-bar.c-match    { background: #e53935; }
 .sch-color-bar.c-event    { background: #e8528a; }
 .sch-color-bar.c-camp     { background: #f0a500; }
 .sch-color-bar.c-other    { background: #ccc; }
@@ -158,6 +162,7 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
   font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 99px;
 }
 .cat-badge.c-baseball { background: #e8f2ff; color: #4a90e2; }
+.cat-badge.c-match    { background: #fde8e8; color: #e53935; }
 .cat-badge.c-event    { background: #fde8f0; color: #e8528a; }
 .cat-badge.c-camp     { background: #fff4d8; color: #c07800; }
 .cat-badge.c-other    { background: #f0f0f0; color: #888; }
@@ -208,6 +213,7 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 }
 .cat-opt.selected { border-color: transparent; }
 .cat-opt.selected.c-baseball { background: #e8f2ff; border-color: #4a90e2; }
+.cat-opt.selected.c-match    { background: #fde8e8; border-color: #e53935; }
 .cat-opt.selected.c-event    { background: #fde8f0; border-color: #e8528a; }
 .cat-opt.selected.c-camp     { background: #fff4d8; border-color: #f0a500; }
 .cat-opt.selected.c-other    { background: #f0f0f0; border-color: #aaa; }
@@ -243,10 +249,13 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 .day-event-name { font-size: 15px; font-weight: 800; }
 .day-event-cat  { font-size: 11px; color: #8a7a6a; margin-top: 2px; }
 
+@media (max-width: 480px) {
+  .next-grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 380px) {
   .next-grid { gap: 6px; }
   .nc-icon { font-size: 17px; }
-  .cat-select-row { grid-template-columns: repeat(2, 1fr); }
+  .cat-select-row { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
 </head>
@@ -277,6 +286,12 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
       <div class="nc-cat c-baseball">野球</div>
       <div id="nc-baseball-date" class="nc-date">—</div>
       <div id="nc-baseball-name" class="nc-name nc-none">なし</div>
+    </div>
+    <div class="next-card c-match" onclick="jumpToCategory('match')">
+      <div class="nc-icon">🏆</div>
+      <div class="nc-cat c-match">試合</div>
+      <div id="nc-match-date" class="nc-date">—</div>
+      <div id="nc-match-name" class="nc-name nc-none">なし</div>
     </div>
     <div class="next-card c-event" onclick="jumpToCategory('event')">
       <div class="nc-icon">🎉</div>
@@ -338,11 +353,12 @@ var GAS_URL = "https://script.google.com/macros/s/AKfycby7DVWcAxD6X8Vyw_sJLiOWDE
 
 var CATS = {
   baseball: { label: "野球",    icon: "⚾",  cls: "c-baseball" },
+  match:    { label: "試合",    icon: "🏆",  cls: "c-match"    },
   event:    { label: "イベント", icon: "🎉", cls: "c-event"    },
   camp:     { label: "合宿",    icon: "🏕️", cls: "c-camp"     },
   other:    { label: "その他",  icon: "📌",  cls: "c-other"    }
 };
-var CAT_ORDER = ["baseball", "event", "camp", "other"];
+var CAT_ORDER = ["baseball", "match", "event", "camp", "other"];
 
 // ===== 状態 =====
 var schedules = [];
@@ -515,7 +531,7 @@ function renderCalendar() {
 // ===== 次のイベント =====
 function renderNextEvents() {
   var today = todayISO();
-  ["baseball", "event", "camp"].forEach(function(cat) {
+  ["baseball", "match", "event", "camp"].forEach(function(cat) {
     var next = schedules
       .filter(function(s){ return s.category === cat; })
       .map(function(s){ return { s: s, iso: normISO(s.date) }; })

@@ -4,174 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>LS Portal</title>
+<title>出席管理</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; color: #2d2416; min-height: 100vh; }
 
-/* ===== ヘッダー ===== */
-#app-header {
-  background: #fff;
-  border-bottom: 3px solid #f0a500;
-  padding: 14px 16px 0;
-  box-shadow: 0 2px 16px rgba(240,165,0,0.12);
-  position: sticky; top: 0; z-index: 10;
-}
-.app-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.app-title { font-size: 20px; font-weight: 900; color: #2d2416; letter-spacing: 1px; }
-.app-title span { color: #f0a500; }
-.app-subtitle { font-size: 9px; letter-spacing: 3px; color: #b8996a; font-weight: 700; }
-#attendance-settings-btn { border-radius: 8px; font-size: 12px; font-weight: 700; padding: 4px 10px; cursor: pointer; border: 1.5px solid #f0a500; background: #fff8e8; color: #c07800; display: none; }
-
-/* ===== タブバー ===== */
-#tab-bar {
-  display: flex;
-  border-top: 1px solid #f0e8d8;
-}
-.tab-btn {
-  flex: 1; padding: 10px 0 8px; font-size: 12px; font-weight: 800;
-  border: none; background: transparent; color: #b8996a; cursor: pointer;
-  border-bottom: 3px solid transparent; margin-bottom: -3px;
-  transition: color 0.2s;
-}
+/* タブ */
+#tab-bar { display: none; }
+.tab-btn { flex: 1; padding: 12px 0; font-size: 13px; font-weight: 800; border: none; background: transparent; color: #b8996a; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
 .tab-btn.active { color: #f0a500; border-bottom-color: #f0a500; }
 
-/* ===== ページ ===== */
+/* ヘッダー */
+#header { background: #fff; border-bottom: 3px solid #f0a500; padding: 14px 16px; box-shadow: 0 2px 16px rgba(240,165,0,0.12); position: sticky; top: 0; z-index: 10; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.header-label { font-size: 10px; letter-spacing: 4px; color: #f0a500; font-weight: 800; }
+#settings-btn { border-radius: 8px; font-size: 12px; font-weight: 700; padding: 4px 10px; cursor: pointer; border: 1.5px solid #f0a500; background: #fff8e8; color: #c07800; }
+.header-mid { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; }
+#session-label { background: transparent; border: none; border-bottom: 2px dashed #e8d5b0; color: #2d2416; font-size: 18px; font-weight: 800; outline: none; padding: 2px 4px; max-width: 200px; }
+#count-num { font-size: 40px; font-weight: 900; color: #f0a500; }
+#count-total { font-size: 14px; color: #b8996a; margin-left: 4px; }
+#progress-bar { background: #f0e8d8; border-radius: 99px; height: 7px; overflow: hidden; }
+#progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#f0a500,#e05a00); border-radius: 99px; transition: width 0.4s; }
+.header-bottom { display: flex; justify-content: space-between; margin-top: 5px; font-size: 11px; color: #b8996a; }
+#pct-text { color: #e05a00; font-weight: 700; }
+
+/* ページ切り替え */
 .page { display: none; }
 .page.active { display: block; }
 
-/* ===== カレンダーページ ===== */
-#calendar-page { padding: 14px 12px 100px; max-width: 600px; margin: 0 auto; }
-
-/* 次のイベントカード */
-.next-section-title {
-  font-size: 11px; font-weight: 800; color: #b8996a; letter-spacing: 2px;
-  margin-bottom: 10px;
-}
-.next-events-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px;
-}
-.next-event-card {
-  background: #fff; border: 2px solid #e8ddd0; border-radius: 14px;
-  padding: 12px 10px; text-align: center; cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.next-event-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
-.next-event-card.cat-baseball { border-top: 4px solid #4a90e2; }
-.next-event-card.cat-event    { border-top: 4px solid #e8528a; }
-.next-event-card.cat-camp     { border-top: 4px solid #f0a500; }
-.next-event-icon { font-size: 22px; margin-bottom: 4px; }
-.next-event-cat  { font-size: 10px; font-weight: 800; margin-bottom: 6px; }
-.next-event-cat.cat-baseball { color: #4a90e2; }
-.next-event-cat.cat-event    { color: #e8528a; }
-.next-event-cat.cat-camp     { color: #f0a500; }
-.next-event-date { font-size: 11px; color: #b8996a; font-weight: 600; margin-bottom: 3px; }
-.next-event-name { font-size: 12px; font-weight: 800; color: #2d2416; line-height: 1.3; word-break: break-all; }
-.next-event-none { font-size: 11px; color: #c8bfb0; margin-top: 4px; }
-
-/* カレンダー本体 */
-.cal-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
-}
-.cal-nav-btn {
-  background: #fff; border: 2px solid #e8ddd0; border-radius: 10px;
-  color: #b8996a; font-size: 18px; width: 38px; height: 38px;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  font-weight: 700;
-}
-.cal-nav-btn:hover { border-color: #f0a500; color: #f0a500; }
-.cal-month-label { font-size: 18px; font-weight: 900; color: #2d2416; }
-.cal-month-label span { color: #f0a500; }
-
-.cal-grid {
-  background: #fff; border-radius: 16px;
-  overflow: hidden; border: 2px solid #e8ddd0;
-}
-.cal-weekdays {
-  display: grid; grid-template-columns: repeat(7,1fr);
-  background: #fff8e8; border-bottom: 1px solid #e8ddd0;
-}
-.cal-wd {
-  text-align: center; font-size: 11px; font-weight: 800;
-  padding: 8px 0; color: #b8996a;
-}
-.cal-wd:first-child { color: #e05a00; }
-.cal-wd:last-child  { color: #4a90e2; }
-.cal-days { display: grid; grid-template-columns: repeat(7,1fr); }
-.cal-day {
-  min-height: 54px; padding: 6px 4px 4px;
-  border-right: 1px solid #f0e8d8; border-bottom: 1px solid #f0e8d8;
-  cursor: pointer; position: relative;
-  transition: background 0.15s;
-}
-.cal-day:nth-child(7n) { border-right: none; }
-.cal-day:hover { background: #fff8e8; }
-.cal-day.empty { background: #faf6f0; cursor: default; }
-.cal-day.empty:hover { background: #faf6f0; }
-.cal-day.today .cal-day-num {
-  background: #f0a500; color: #fff; border-radius: 50%;
-  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 2px;
-}
-.cal-day-num {
-  font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 2px; color: #2d2416;
-}
-.cal-day:nth-child(7n+1) .cal-day-num { color: #e05a00; }
-.cal-day:nth-child(7n)   .cal-day-num { color: #4a90e2; }
-.cal-day.today .cal-day-num { color: #fff !important; }
-.cal-dots { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
-.cal-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-}
-.cal-dot.cat-baseball { background: #4a90e2; }
-.cal-dot.cat-event    { background: #e8528a; }
-.cal-dot.cat-camp     { background: #f0a500; }
-.cal-dot.cat-other    { background: #9e9e9e; }
-
-/* ===== スケジュールページ ===== */
-#schedule-page { padding: 16px 14px 120px; max-width: 600px; margin: 0 auto; }
-.schedule-section-title { font-size: 11px; font-weight: 800; color: #b8996a; letter-spacing: 2px; margin: 16px 0 8px; }
-.schedule-item {
-  background: #fff; border: 2px solid #e8ddd0; border-radius: 14px;
-  padding: 12px 14px; margin-bottom: 8px;
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer; user-select: none;
-}
-.schedule-item:hover { border-color: #f0a500; background: #fff8e8; }
-.schedule-date { font-size: 12px; color: #b8996a; font-weight: 600; margin-bottom: 2px; }
-.schedule-name { font-size: 15px; font-weight: 800; color: #2d2416; }
-.schedule-right { display: flex; align-items: center; gap: 8px; }
-.schedule-arrow { font-size: 16px; color: #b8996a; }
-.cat-badge {
-  font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 99px;
-}
-.cat-badge.cat-baseball { background: #e8f2ff; color: #4a90e2; }
-.cat-badge.cat-event    { background: #fde8f0; color: #e8528a; }
-.cat-badge.cat-camp     { background: #fff4d8; color: #c07800; }
-.cat-badge.cat-other    { background: #f0f0f0; color: #888; }
-
-#schedule-add-btn {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  padding: 13px 14px 52px;
-  background: linear-gradient(135deg,#f0a500,#e05a00);
-  border: none; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer;
-}
-
-/* ===== 出欠ページ ===== */
-#attendance-header {
-  background: #fff; padding: 12px 16px; margin-bottom: 0;
-  border-bottom: 1px solid #f0e8d8;
-}
-.att-header-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 10px; }
-#session-label { background: transparent; border: none; border-bottom: 2px dashed #e8d5b0; color: #2d2416; font-size: 17px; font-weight: 800; outline: none; padding: 2px 4px; max-width: 200px; }
-#count-num { font-size: 38px; font-weight: 900; color: #f0a500; }
-#count-total { font-size: 13px; color: #b8996a; margin-left: 4px; }
-#progress-bar { background: #f0e8d8; border-radius: 99px; height: 7px; overflow: hidden; }
-#progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#f0a500,#e05a00); border-radius: 99px; transition: width 0.4s; }
-.att-header-bottom { display: flex; justify-content: space-between; margin-top: 5px; font-size: 11px; color: #b8996a; }
-#pct-text { color: #e05a00; font-weight: 700; }
-
+/* 出欠ページ */
 #attendance-page { padding: 14px 12px 200px; max-width: 600px; margin: 0 auto; }
 #send-result { display: none; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; font-weight: 700; align-items: center; justify-content: space-between; }
 #send-result.ok { background: #efffef; border: 1.5px solid #6dcc6d; color: #2a7a2a; display: flex; }
@@ -190,7 +51,8 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 .member-toggle { width: 100%; padding: 8px 0; border-radius: 9px; border: none; cursor: pointer; font-weight: 800; font-size: 12px; background: #f5ede0; color: #b8996a; }
 .member-card.on .member-toggle { background: linear-gradient(135deg,#f0a500,#e05a00); color: #fff; }
 
-#bottom-bar { background: linear-gradient(0deg,#fdf6ee 75%,transparent); padding: 10px 14px 52px; position: fixed; bottom: 0; left: 0; right: 0; display: none; }
+/* ボトムバー：attendance-pageの中に入れてfixedにしない */
+#bottom-bar { background: linear-gradient(0deg,#fdf6ee 75%,transparent); padding: 10px 14px 52px; position: fixed; bottom: 0; left: 0; right: 0; }
 .bottom-inner { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
 #send-btn { width: 100%; padding: 13px; background: linear-gradient(135deg,#34a853,#1e7e34); border: none; border-radius: 13px; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 18px rgba(52,168,83,0.3); }
 #send-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
@@ -203,60 +65,48 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
 #add-confirm-btn { background: #f0a500; border: none; border-radius: 11px; color: #fff; font-size: 14px; font-weight: 800; padding: 0 14px; cursor: pointer; }
 #add-cancel-btn { background: #e8ddd0; border: none; border-radius: 11px; color: #7a6a54; font-size: 17px; padding: 0 11px; cursor: pointer; }
 
-/* ===== モーダル ===== */
+/* スケジュールページ */
+#schedule-page { padding: 16px 14px 120px; max-width: 600px; margin: 0 auto; }
+.schedule-section-title { font-size: 11px; font-weight: 800; color: #b8996a; letter-spacing: 2px; margin: 16px 0 8px; }
+.schedule-item { background: #fff; border: 2px solid #e8ddd0; border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.schedule-item:hover { border-color: #f0a500; background: #fff8e8; }
+.schedule-date { font-size: 12px; color: #b8996a; font-weight: 600; margin-bottom: 2px; }
+.schedule-name { font-size: 15px; font-weight: 800; color: #2d2416; }
+.schedule-arrow { font-size: 16px; color: #b8996a; }
+#schedule-add-btn { position: fixed; bottom: 0; left: 0; right: 0; padding: 13px 14px 52px; background: linear-gradient(135deg,#f0a500,#e05a00); border: none; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
+
+/* モーダル */
 #modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 #modal-overlay.show { display: flex; }
-#modal { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto; }
+#modal { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
 #modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
 #modal p { font-size: 12px; color: #8a7a6a; margin-bottom: 16px; line-height: 1.8; }
 .modal-input { width: 100%; background: #f5ede0; border: 2px solid #e8d5b0; border-radius: 10px; font-size: 13px; padding: 10px 12px; outline: none; color: #2d2416; margin-bottom: 8px; }
-.modal-select { width: 100%; background: #f5ede0; border: 2px solid #e8d5b0; border-radius: 10px; font-size: 13px; padding: 10px 12px; outline: none; color: #2d2416; margin-bottom: 8px; appearance: none; cursor: pointer; }
-.modal-label { font-size: 11px; font-weight: 800; color: #b8996a; margin-bottom: 4px; display: block; }
 .modal-btns { display: flex; gap: 8px; margin-top: 12px; }
 #modal-save-btn { flex: 1; background: linear-gradient(135deg,#f0a500,#e05a00); border: none; border-radius: 12px; color: #fff; font-size: 14px; font-weight: 800; padding: 13px; cursor: pointer; }
 #modal-close-btn { background: #f0e8d8; border: none; border-radius: 12px; color: #8a7a6a; font-size: 14px; padding: 13px 14px; cursor: pointer; }
 #modal-del-btn { background: #fff0f0; border: 1.5px solid #ffaaaa; border-radius: 12px; color: #cc4444; font-size: 14px; padding: 13px 14px; cursor: pointer; display: none; }
 
-/* 日付詳細モーダル */
-.day-detail-event {
-  background: #f5ede0; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
-  display: flex; align-items: center; gap: 10px; cursor: pointer;
-}
-.day-detail-event:hover { background: #fff4d8; }
-.day-detail-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-.day-detail-info {}
-.day-detail-name { font-size: 15px; font-weight: 800; color: #2d2416; }
-.day-detail-cat  { font-size: 11px; color: #b8996a; margin-top: 2px; }
-
-@media (max-width: 380px) {
-  #members-grid { grid-template-columns: repeat(2, 1fr); }
-  .next-events-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .next-event-card { padding: 10px 6px; }
-  .next-event-icon { font-size: 18px; }
-}
+@media (max-width: 380px) { #members-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
 
-<!-- ===== アプリヘッダー ===== -->
-<div id="app-header">
-  <div class="app-header-top">
-    <div>
-      <div class="app-title">LS <span>Portal</span></div>
-      <div class="app-subtitle">CIRCLE APP</div>
-    </div>
-    <button id="attendance-settings-btn">⚙️ 連携済み</button>
-  </div>
-  <div id="tab-bar">
-    <button class="tab-btn active" id="tab-calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
-    <button class="tab-btn" id="tab-schedule" onclick="switchTab('schedule')">📋 スケジュール</button>
-    <button class="tab-btn" id="tab-attendance" onclick="switchTab('attendance')">✓ 出欠</button>
-  </div>
+<!-- タブ -->
+<div id="tab-bar">
+  <button class="tab-btn active" id="tab-schedule-top" style="pointer-events:none;">📅 スケジュール</button>
 </div>
 
-<!-- 出欠ヘッダー（出欠タブ時のみ表示） -->
-<div id="attendance-header" style="display:none;">
-  <div class="att-header-row">
+<!-- ヘッダー -->
+<div id="header" style="display:none;">
+  <div id="back-to-schedule" style="display:none;margin-bottom:8px;">
+    <button onclick="switchTab('schedule')" style="background:none;border:none;color:#f0a500;font-size:13px;font-weight:800;cursor:pointer;padding:0;">← スケジュールに戻る</button>
+  </div>
+  <div class="header-top">
+    <div class="header-label">● CIRCLE ATTENDANCE</div>
+    <button id="settings-btn">⚙️ 連携済み</button>
+  </div>
+  <div class="header-mid">
     <input id="session-label" type="text" value="第1回活動" />
     <div>
       <span id="count-num">0</span>
@@ -264,65 +114,13 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
     </div>
   </div>
   <div id="progress-bar"><div id="progress-fill"></div></div>
-  <div class="att-header-bottom">
+  <div class="header-bottom">
     <span>出席率 <span id="pct-text">0%</span></span>
     <span>未出席 <span id="absent-text">0</span>名</span>
   </div>
 </div>
 
-<!-- ===== カレンダーページ ===== -->
-<div id="calendar-page" class="page active">
-  <!-- 次のイベント -->
-  <div style="padding: 14px 12px 0; max-width: 600px; margin: 0 auto;">
-    <div class="next-section-title">▸ 次のイベント</div>
-    <div class="next-events-grid">
-      <div class="next-event-card cat-baseball" id="next-baseball" onclick="jumpToNextEvent('baseball')">
-        <div class="next-event-icon">⚾</div>
-        <div class="next-event-cat cat-baseball">野球</div>
-        <div id="next-baseball-date" class="next-event-date">—</div>
-        <div id="next-baseball-name" class="next-event-name next-event-none">なし</div>
-      </div>
-      <div class="next-event-card cat-event" id="next-event-card" onclick="jumpToNextEvent('event')">
-        <div class="next-event-icon">🎉</div>
-        <div class="next-event-cat cat-event">イベント</div>
-        <div id="next-event-date" class="next-event-date">—</div>
-        <div id="next-event-name" class="next-event-name next-event-none">なし</div>
-      </div>
-      <div class="next-event-card cat-camp" id="next-camp" onclick="jumpToNextEvent('camp')">
-        <div class="next-event-icon">🏕️</div>
-        <div class="next-event-cat cat-camp">合宿</div>
-        <div id="next-camp-date" class="next-event-date">—</div>
-        <div id="next-camp-name" class="next-event-name next-event-none">なし</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- カレンダー本体 -->
-  <div style="padding: 0 12px 14px; max-width: 600px; margin: 0 auto;">
-    <div class="cal-nav">
-      <button class="cal-nav-btn" id="cal-prev" onclick="changeMonth(-1)">‹</button>
-      <div class="cal-month-label" id="cal-month-label"></div>
-      <button class="cal-nav-btn" id="cal-next" onclick="changeMonth(1)">›</button>
-    </div>
-    <div class="cal-grid">
-      <div class="cal-weekdays">
-        <div class="cal-wd">日</div><div class="cal-wd">月</div><div class="cal-wd">火</div>
-        <div class="cal-wd">水</div><div class="cal-wd">木</div><div class="cal-wd">金</div>
-        <div class="cal-wd">土</div>
-      </div>
-      <div class="cal-days" id="cal-days"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== スケジュールページ ===== -->
-<div id="schedule-page" class="page">
-  <div id="schedule-loading" style="text-align:center;color:#b8996a;font-size:13px;padding:30px 0;">読み込み中...</div>
-  <div id="schedule-list"></div>
-  <button id="schedule-add-btn" style="display:none;">＋ スケジュールを追加</button>
-</div>
-
-<!-- ===== 出欠ページ ===== -->
+<!-- 出欠ページ -->
 <div id="attendance-page" class="page">
   <div id="send-result">
     <span id="result-msg"></span>
@@ -331,8 +129,15 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
   <div id="members-grid"></div>
 </div>
 
-<!-- ===== ボトムバー ===== -->
-<div id="bottom-bar">
+<!-- スケジュールページ -->
+<div id="schedule-page" class="page active">
+  <div id="schedule-loading" style="text-align:center;color:#b8996a;font-size:13px;padding:30px 0;">読み込み中...</div>
+  <div id="schedule-list"></div>
+  <button id="schedule-add-btn">＋ スケジュールを追加</button>
+</div>
+
+<!-- ボトムバー（fixed、常にDOMの末尾） -->
+<div id="bottom-bar" style="display:none;">
   <div class="bottom-inner">
     <button id="send-btn">📊 スプレッドシートに記録する</button>
     <div class="bottom-row">
@@ -347,7 +152,7 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
   </div>
 </div>
 
-<!-- ===== モーダル ===== -->
+<!-- モーダル -->
 <div id="modal-overlay">
   <div id="modal">
     <h2 id="modal-title"></h2>
@@ -361,13 +166,11 @@ body { background: #fdf6ee; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans
   </div>
 </div>
 
-<iframe id="gas-iframe" name="gas-iframe" style="display:none;"></iframe>
-
 <script>
-// ===== 定数 =====
-var GAS_URL = "https://script.google.com/macros/s/AKfycby7DVWcAxD6X8Vyw_sJLiOWDEkwsuAgsfgqdV7vEBGUv0QXsP00gjkWx2hZGKEt0qef/exec";
-var MEMBERS_VERSION = "v3";
-var INITIAL_MEMBERS = [
+// ===== データ =====
+const GAS_URL = "https://script.google.com/macros/s/AKfycby7DVWcAxD6X8Vyw_sJLiOWDEkwsuAgsfgqdV7vEBGUv0QXsP00gjkWx2hZGKEt0qef/exec";
+const MEMBERS_VERSION = "v3";
+const INITIAL_MEMBERS = [
   {id:1,name:"こうせい"},{id:2,name:"なおき"},{id:3,name:"きょうへい"},{id:4,name:"たけし"},
   {id:5,name:"いしい"},{id:6,name:"まさと"},{id:7,name:"ほりいけ"},{id:8,name:"こういち"},
   {id:9,name:"まさひろ"},{id:10,name:"すず"},{id:11,name:"あき"},{id:12,name:"ゆり"},
@@ -381,49 +184,187 @@ var INITIAL_MEMBERS = [
   {id:41,name:"あかり"},{id:42,name:"ひなた"},{id:43,name:"みづき"},{id:44,name:"みゆ"}
 ];
 
-var CAT_META = {
-  baseball: { label: "野球", icon: "⚾", cls: "cat-baseball" },
-  event:    { label: "イベント", icon: "🎉", cls: "cat-event" },
-  camp:     { label: "合宿", icon: "🏕️", cls: "cat-camp" },
-  other:    { label: "その他", icon: "📌", cls: "cat-other" }
-};
+let members = [];
+let attended = new Set();
+let lastSessionId = null;
+let schedules = [];
+let dragSrcId = null;
+let modalMode = "settings";
+let editingScheduleId = null;
+let currentTab = "attendance";
+let currentEventDate = null; // スケジュールから来た時の日付
 
-// ===== 状態 =====
-var members = [];
-var attended = new Set();
-var lastSessionId = null;
-var schedules = [];
-var dragSrcId = null;
-var modalMode = "settings";
-var editingScheduleId = null;
-var currentTab = "calendar";
-var currentEventDate = null;
-
-var calYear, calMonth; // 表示中のカレンダー年月
-
-// ===== 日付ユーティリティ =====
-function todayJST() {
-  var d = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
-  return { y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate() };
-}
-function todayStr() {
-  var t = todayJST();
-  return t.y + "/" + String(t.m).padStart(2,"0") + "/" + String(t.d).padStart(2,"0");
-}
-function todayISO() {
-  var t = todayJST();
-  return t.y + "-" + String(t.m).padStart(2,"0") + "-" + String(t.d).padStart(2,"0");
-}
-function normalizeDate(raw) {
-  if (!raw) return "";
-  var m = String(raw).match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-  if (m) return m[1] + "-" + m[2].padStart(2,"0") + "-" + m[3].padStart(2,"0");
-  var d = new Date(raw);
-  if (!isNaN(d.getTime())) {
-    var jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-    return jst.getUTCFullYear() + "-" + String(jst.getUTCMonth()+1).padStart(2,"0") + "-" + String(jst.getUTCDate()).padStart(2,"0");
+// ===== 初期化 =====
+function init() {
+  try {
+    const ver = localStorage.getItem("membersVersion");
+    const saved = localStorage.getItem("members");
+    if (saved && ver === MEMBERS_VERSION) {
+      members = JSON.parse(saved);
+    } else {
+      members = INITIAL_MEMBERS.map(function(m) { return {id: m.id, name: m.name}; });
+      localStorage.setItem("members", JSON.stringify(members));
+      localStorage.setItem("membersVersion", MEMBERS_VERSION);
+    }
+  } catch(e) {
+    members = INITIAL_MEMBERS.map(function(m) { return {id: m.id, name: m.name}; });
   }
-  return String(raw);
+
+  // イベント
+
+  document.getElementById("settings-btn").onclick = openSettings;
+  document.getElementById("send-btn").onclick = sendToSheet;
+  document.getElementById("undo-btn").onclick = undoRecord;
+  document.getElementById("add-btn").onclick = showAddForm;
+  document.getElementById("add-cancel-btn").onclick = cancelAdd;
+  document.getElementById("add-confirm-btn").onclick = confirmAdd;
+  document.getElementById("reset-btn").onclick = resetAttendance;
+  document.getElementById("schedule-add-btn").onclick = openAddSchedule;
+  document.getElementById("modal-save-btn").onclick = saveModal;
+  document.getElementById("modal-del-btn").onclick = deleteScheduleItem;
+  document.getElementById("modal-close-btn").onclick = closeModal;
+  document.getElementById("modal-overlay").onclick = function(e) { if (e.target === this) closeModal(); };
+  document.getElementById("new-name-input").onkeydown = function(e) { if (e.key === "Enter") confirmAdd(); };
+
+  renderGrid();
+  updateHeader();
+  loadSchedules();
+}
+
+// ===== タブ切り替え =====
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById("attendance-page").classList.toggle("active", tab === "attendance");
+  document.getElementById("schedule-page").classList.toggle("active", tab === "schedule");
+  document.getElementById("header").style.display = tab === "attendance" ? "block" : "none";
+  document.getElementById("bottom-bar").style.display = tab === "attendance" ? "block" : "none";
+  var backBtn = document.getElementById("back-to-schedule");
+  if (backBtn) backBtn.style.display = tab === "attendance" ? "block" : "none";
+}
+
+// ===== メンバー =====
+function saveMembers() { localStorage.setItem("members", JSON.stringify(members)); }
+
+function renderGrid() {
+  var grid = document.getElementById("members-grid");
+  grid.innerHTML = "";
+  for (var i = 0; i < members.length; i++) {
+    (function(m) {
+      var isOn = attended.has(m.id);
+      var card = document.createElement("div");
+      card.className = "member-card" + (isOn ? " on" : "");
+      card.id = "card-" + m.id;
+      card.draggable = true;
+
+      var delBtn = document.createElement("button");
+      delBtn.className = "member-del";
+      delBtn.textContent = "✕";
+      delBtn.onclick = function(e) { e.stopPropagation(); removeMember(m.id); };
+
+      var nameDiv = document.createElement("div");
+      nameDiv.className = "member-name";
+      nameDiv.textContent = m.name;
+      nameDiv.onclick = function(e) { e.stopPropagation(); startEdit(m.id); };
+
+      var toggleBtn = document.createElement("button");
+      toggleBtn.className = "member-toggle";
+      toggleBtn.textContent = isOn ? "✓ 出席" : "欠席";
+      toggleBtn.onclick = function(e) { e.stopPropagation(); toggleMember(m.id); };
+
+      card.appendChild(delBtn);
+      card.appendChild(nameDiv);
+      card.appendChild(toggleBtn);
+
+      card.ondragstart = function(e) { dragSrcId = m.id; card.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; };
+      card.ondragend = function() { card.classList.remove("dragging"); document.querySelectorAll(".drag-over").forEach(function(c){c.classList.remove("drag-over");}); };
+      card.ondragover = function(e) { e.preventDefault(); card.classList.add("drag-over"); };
+      card.ondragleave = function() { card.classList.remove("drag-over"); };
+      card.ondrop = function(e) {
+        e.preventDefault();
+        var si = members.findIndex(function(x){return x.id===dragSrcId;});
+        var di = members.findIndex(function(x){return x.id===m.id;});
+        if (si === di) return;
+        var item = members.splice(si, 1)[0];
+        members.splice(di, 0, item);
+        saveMembers(); renderGrid();
+      };
+
+      grid.appendChild(card);
+    })(members[i]);
+  }
+}
+
+function updateHeader() {
+  var count = attended.size, total = members.length;
+  var pct = total === 0 ? 0 : Math.round(count / total * 100);
+  document.getElementById("count-num").textContent = count;
+  document.getElementById("count-total").textContent = "/ " + total + "名";
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("pct-text").textContent = pct + "%";
+  document.getElementById("absent-text").textContent = total - count;
+}
+
+function toggleMember(id) {
+  if (attended.has(id)) attended.delete(id); else attended.add(id);
+  var card = document.getElementById("card-" + id);
+  card.classList.toggle("on", attended.has(id));
+  card.querySelector(".member-toggle").textContent = attended.has(id) ? "✓ 出席" : "欠席";
+  updateHeader();
+}
+
+function removeMember(id) {
+  members = members.filter(function(m){return m.id!==id;});
+  attended.delete(id);
+  saveMembers(); renderGrid(); updateHeader();
+}
+
+function startEdit(id) {
+  var nameEl = document.getElementById("members-grid").querySelector("#card-" + id + " .member-name");
+  if (!nameEl) return;
+  var member = members.find(function(m){return m.id===id;});
+  if (!member) return;
+  var input = document.createElement("input");
+  input.className = "member-name-input";
+  input.value = member.name;
+  nameEl.replaceWith(input);
+  input.focus();
+  function save() {
+    var n = input.value.trim();
+    if (n) { member.name = n; saveMembers(); }
+    var div = document.createElement("div");
+    div.className = "member-name"; div.textContent = member.name;
+    div.onclick = function(e) { e.stopPropagation(); startEdit(id); };
+    input.replaceWith(div);
+  }
+  input.onblur = save;
+  input.onkeydown = function(e) { if (e.key === "Enter") input.blur(); };
+}
+
+function resetAttendance() { attended.clear(); lastSessionId = null; currentEventDate = null; hideResult(); renderGrid(); updateHeader(); }
+
+function showAddForm() {
+  document.getElementById("add-form").classList.add("show");
+  document.getElementById("add-btn").style.display = "none";
+  document.getElementById("reset-btn").style.display = "none";
+  document.getElementById("new-name-input").focus();
+}
+function cancelAdd() {
+  document.getElementById("add-form").classList.remove("show");
+  document.getElementById("add-btn").style.display = "";
+  document.getElementById("reset-btn").style.display = "";
+  document.getElementById("new-name-input").value = "";
+}
+function confirmAdd() {
+  var name = document.getElementById("new-name-input").value.trim();
+  if (!name) return;
+  members.push({id: Date.now(), name: name});
+  saveMembers(); renderGrid(); updateHeader(); cancelAdd();
+}
+
+// ===== スケジュール =====
+function todayStr() {
+  var d = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
+  return d.getFullYear() + "/" + String(d.getMonth()+1).padStart(2,"0") + "/" + String(d.getDate()).padStart(2,"0");
 }
 function parseDate(str) {
   var m = str.trim().match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
@@ -435,231 +376,13 @@ function isoToDisplay(iso) {
   var p = iso.split("-");
   return p[0] + "/" + p[1] + "/" + p[2];
 }
-var WEEKDAYS = ["日","月","火","水","木","金","土"];
-function isoToReadable(iso) {
-  if (!iso) return "";
-  var p = iso.match(/(\d{4})-(\d{2})-(\d{2})/);
-  if (!p) return iso;
-  var y = parseInt(p[1]), mo = parseInt(p[2])-1, d = parseInt(p[3]);
-  var dow = new Date(y, mo, d).getDay();
-  return parseInt(p[2]) + "/" + parseInt(p[3]) + "（" + WEEKDAYS[dow] + "）";
-}
 
-// ===== 初期化 =====
-function init() {
-  try {
-    var ver = localStorage.getItem("membersVersion");
-    var saved = localStorage.getItem("members");
-    if (saved && ver === MEMBERS_VERSION) {
-      members = JSON.parse(saved);
-    } else {
-      members = INITIAL_MEMBERS.map(function(m){ return {id: m.id, name: m.name}; });
-      localStorage.setItem("members", JSON.stringify(members));
-      localStorage.setItem("membersVersion", MEMBERS_VERSION);
-    }
-  } catch(e) {
-    members = INITIAL_MEMBERS.map(function(m){ return {id: m.id, name: m.name}; });
-  }
-
-  document.getElementById("attendance-settings-btn").onclick = openSettings;
-  document.getElementById("send-btn").onclick = sendToSheet;
-  document.getElementById("undo-btn").onclick = undoRecord;
-  document.getElementById("add-btn").onclick = showAddForm;
-  document.getElementById("add-cancel-btn").onclick = cancelAdd;
-  document.getElementById("add-confirm-btn").onclick = confirmAdd;
-  document.getElementById("reset-btn").onclick = resetAttendance;
-  document.getElementById("schedule-add-btn").onclick = openAddSchedule;
-  document.getElementById("modal-save-btn").onclick = saveModal;
-  document.getElementById("modal-del-btn").onclick = deleteScheduleItem;
-  document.getElementById("modal-close-btn").onclick = closeModal;
-  document.getElementById("modal-overlay").onclick = function(e){ if(e.target===this) closeModal(); };
-  document.getElementById("new-name-input").onkeydown = function(e){ if(e.key==="Enter") confirmAdd(); };
-
-  var t = todayJST();
-  calYear = t.y; calMonth = t.m;
-
-  renderGrid();
-  updateHeader();
-  loadSchedules();
-}
-
-// ===== タブ切り替え =====
-function switchTab(tab) {
-  currentTab = tab;
-  ["calendar","schedule","attendance"].forEach(function(t){
-    document.getElementById(t + "-page").classList.toggle("active", t === tab);
-    document.getElementById("tab-" + t).classList.toggle("active", t === tab);
-  });
-  document.getElementById("attendance-header").style.display = tab === "attendance" ? "block" : "none";
-  document.getElementById("attendance-settings-btn").style.display = tab === "attendance" ? "block" : "none";
-  document.getElementById("bottom-bar").style.display = tab === "attendance" ? "block" : "none";
-  document.getElementById("schedule-add-btn").style.display = tab === "schedule" ? "block" : "none";
-}
-
-// ===== カレンダー =====
-function changeMonth(delta) {
-  calMonth += delta;
-  if (calMonth > 12) { calMonth = 1; calYear++; }
-  if (calMonth < 1)  { calMonth = 12; calYear--; }
-  renderCalendar();
-}
-
-function renderCalendar() {
-  var label = document.getElementById("cal-month-label");
-  label.innerHTML = calYear + "年 <span>" + calMonth + "月</span>";
-
-  var days = document.getElementById("cal-days");
-  days.innerHTML = "";
-
-  var today = todayISO();
-  var firstDow = new Date(calYear, calMonth - 1, 1).getDay();
-  var lastDay  = new Date(calYear, calMonth, 0).getDate();
-
-  // scheduleをISOキーでマップ化
-  var evMap = {};
-  schedules.forEach(function(s){
-    var iso = normalizeDate(s.date);
-    if (!evMap[iso]) evMap[iso] = [];
-    evMap[iso].push(s);
-  });
-
-  // 空セル
-  for (var i = 0; i < firstDow; i++) {
-    var empty = document.createElement("div");
-    empty.className = "cal-day empty";
-    days.appendChild(empty);
-  }
-
-  for (var d = 1; d <= lastDay; d++) {
-    var iso = calYear + "-" + String(calMonth).padStart(2,"0") + "-" + String(d).padStart(2,"0");
-    var cell = document.createElement("div");
-    cell.className = "cal-day" + (iso === today ? " today" : "");
-
-    var numDiv = document.createElement("div");
-    numDiv.className = "cal-day-num";
-    numDiv.textContent = d;
-    cell.appendChild(numDiv);
-
-    var events = evMap[iso];
-    if (events && events.length > 0) {
-      var dotsDiv = document.createElement("div");
-      dotsDiv.className = "cal-dots";
-      events.forEach(function(s){
-        var dot = document.createElement("div");
-        dot.className = "cal-dot " + catClass(s.category);
-        dotsDiv.appendChild(dot);
-      });
-      cell.appendChild(dotsDiv);
-
-      (function(evs, dateIso){ cell.onclick = function(){ openDayDetail(dateIso, evs); }; })(events, iso);
-    } else {
-      cell.style.cursor = "default";
-    }
-
-    days.appendChild(cell);
-  }
-}
-
-function catClass(cat) {
-  if (cat === "baseball") return "cat-baseball";
-  if (cat === "event")    return "cat-event";
-  if (cat === "camp")     return "cat-camp";
-  return "cat-other";
-}
-function catLabel(cat) {
-  return (CAT_META[cat] || CAT_META.other).label;
-}
-
-// 日付詳細モーダル
-function openDayDetail(iso, events) {
-  modalMode = "day-detail";
-  var parts = iso.match(/(\d{4})-(\d{2})-(\d{2})/);
-  var dow = new Date(parseInt(parts[1]), parseInt(parts[2])-1, parseInt(parts[3])).getDay();
-  document.getElementById("modal-title").textContent =
-    parseInt(parts[1]) + "年" + parseInt(parts[2]) + "月" + parseInt(parts[3]) + "日（" + WEEKDAYS[dow] + "）";
-  document.getElementById("modal-desc").textContent = "";
-  var body = document.getElementById("modal-body");
-  body.innerHTML = "";
-  events.forEach(function(s){
-    var row = document.createElement("div");
-    row.className = "day-detail-event";
-    var dot = document.createElement("div");
-    dot.className = "day-detail-dot " + catClass(s.category);
-    var info = document.createElement("div");
-    info.className = "day-detail-info";
-    info.innerHTML =
-      '<div class="day-detail-name">' + escHtml(s.name) + '</div>' +
-      '<div class="day-detail-cat">' + catLabel(s.category) + '</div>';
-    row.appendChild(dot);
-    row.appendChild(info);
-    row.onclick = function(){
-      closeModal();
-      selectScheduleAndGo(s);
-    };
-    body.appendChild(row);
-  });
-  document.getElementById("modal-save-btn").style.display = "none";
-  document.getElementById("modal-del-btn").style.display = "none";
-  document.getElementById("modal-overlay").classList.add("show");
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-
-// 次のイベント表示更新
-function renderNextEvents() {
-  var today = todayISO();
-  ["baseball","event","camp"].forEach(function(cat){
-    var filtered = schedules
-      .filter(function(s){ return s.category === cat; })
-      .map(function(s){ return { s: s, iso: normalizeDate(s.date) }; })
-      .filter(function(x){ return x.iso >= today; })
-      .sort(function(a,b){ return a.iso.localeCompare(b.iso); });
-
-    var dateEl = document.getElementById("next-" + cat + "-date");
-    var nameEl = document.getElementById("next-" + cat + "-name");
-
-    if (!dateEl || !nameEl) return;
-
-    if (filtered.length > 0) {
-      var next = filtered[0];
-      dateEl.textContent = isoToReadable(next.iso);
-      nameEl.textContent = next.s.name;
-      nameEl.classList.remove("next-event-none");
-    } else {
-      dateEl.textContent = "—";
-      nameEl.textContent = "なし";
-      nameEl.classList.add("next-event-none");
-    }
-  });
-}
-
-// 次のイベントカードをタップ → カレンダーでその月へジャンプ
-function jumpToNextEvent(cat) {
-  var today = todayISO();
-  var filtered = schedules
-    .filter(function(s){ return s.category === cat; })
-    .map(function(s){ return { s: s, iso: normalizeDate(s.date) }; })
-    .filter(function(x){ return x.iso >= today; })
-    .sort(function(a,b){ return a.iso.localeCompare(b.iso); });
-  if (filtered.length === 0) return;
-  var iso = filtered[0].iso;
-  var parts = iso.match(/(\d{4})-(\d{2})/);
-  calYear = parseInt(parts[1]);
-  calMonth = parseInt(parts[2]);
-  renderCalendar();
-}
-
-// ===== スケジュール =====
 function loadSchedules() {
   try {
     var c = localStorage.getItem("schedules");
     if (c) schedules = JSON.parse(c);
   } catch(e) {}
   renderSchedules();
-  renderCalendar();
-  renderNextEvents();
 
   fetch(GAS_URL + "?action=getSchedules")
     .then(function(r){ return r.json(); })
@@ -668,11 +391,21 @@ function loadSchedules() {
         schedules = json.schedules;
         localStorage.setItem("schedules", JSON.stringify(schedules));
         renderSchedules();
-        renderCalendar();
-        renderNextEvents();
       }
     })
-    .catch(function(){ /* キャッシュで表示済み */ });
+    .catch(function(){ renderSchedules(); });
+}
+
+function normalizeDate(raw) {
+  if (!raw) return "";
+  var m = String(raw).match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if (m) return m[1] + "-" + m[2].padStart(2,"0") + "-" + m[3].padStart(2,"0");
+  var d = new Date(raw);
+  if (!isNaN(d.getTime())) {
+    var jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    return jst.getUTCFullYear() + "-" + String(jst.getUTCMonth()+1).padStart(2,"0") + "-" + String(jst.getUTCDate()).padStart(2,"0");
+  }
+  return String(raw);
 }
 
 function renderSchedules() {
@@ -683,9 +416,10 @@ function renderSchedules() {
     list.innerHTML = '<div style="text-align:center;color:#b8996a;font-size:13px;padding:40px 0;">スケジュールはまだありません<br><small>下のボタンから追加できます</small></div>';
     return;
   }
+  var weekdays = ["日","月","火","水","木","金","土"];
 
-  var normalized = schedules.map(function(s){
-    return { id: s.id, name: s.name, date: normalizeDate(s.date), category: s.category || "other" };
+  var normalized = schedules.map(function(s) {
+    return {id: s.id, name: s.name, date: normalizeDate(s.date)};
   });
   normalized.sort(function(a,b){ return a.date.localeCompare(b.date); });
 
@@ -711,49 +445,42 @@ function renderSchedules() {
       if (parts) {
         var y = parseInt(parts[1]), mo = parseInt(parts[2])-1, dy = parseInt(parts[3]);
         var dow = new Date(y, mo, dy).getDay();
-        dateStr = y + "/" + String(mo+1).padStart(2,"0") + "/" + String(dy).padStart(2,"0") + "（" + WEEKDAYS[dow] + "）";
+        dateStr = y + "/" + String(mo+1).padStart(2,"0") + "/" + String(dy).padStart(2,"0") + "（" + weekdays[dow] + "）";
       }
       var el = document.createElement("div");
       el.className = "schedule-item";
-
       var left = document.createElement("div");
       var dateDiv = document.createElement("div"); dateDiv.className = "schedule-date"; dateDiv.textContent = dateStr;
       var nameDiv = document.createElement("div"); nameDiv.className = "schedule-name"; nameDiv.textContent = s.name;
       left.appendChild(dateDiv); left.appendChild(nameDiv);
-
-      var right = document.createElement("div"); right.className = "schedule-right";
-      var badge = document.createElement("span");
-      badge.className = "cat-badge " + catClass(s.category);
-      badge.textContent = catLabel(s.category);
       var arrow = document.createElement("div"); arrow.className = "schedule-arrow"; arrow.textContent = "▶";
-      right.appendChild(badge); right.appendChild(arrow);
+      el.appendChild(left); el.appendChild(arrow);
 
-      el.appendChild(left); el.appendChild(right);
-      el.onclick = function(){ selectScheduleAndGo(s); };
-      el.oncontextmenu = function(e){ e.preventDefault(); openEditSchedule(s); };
+      el.onclick = function() { selectSchedule(s); };
+      el.oncontextmenu = function(e) { e.preventDefault(); openEditSchedule(s); };
       var pressTimer = null;
-      el.ontouchstart = function(){ pressTimer = setTimeout(function(){ pressTimer = null; openEditSchedule(s); }, 700); };
-      el.ontouchend = function(){ if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; } };
+      el.onmousedown = function() { pressTimer = setTimeout(function(){ pressTimer = null; openEditSchedule(s); }, 700); };
+      el.onmouseup = function() { if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; } };
+      el.onmouseleave = function() { if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; } };
 
       list.appendChild(el);
     });
   });
 }
-
-function selectScheduleAndGo(s) {
+function selectSchedule(s) {
   document.getElementById("session-label").value = s.name;
-  currentEventDate = normalizeDate(s.date);
+  currentEventDate = s.date; // 例: "2026-03-12"
   switchTab("attendance");
 }
 
 function openAddSchedule() {
   modalMode = "add-schedule";
-  editingScheduleId = null;
-  document.getElementById("modal-title").textContent = "＋ スケジュール追加";
-  document.getElementById("modal-desc").textContent = "日付・カテゴリ・活動名を入力してください。";
-  document.getElementById("modal-body").innerHTML = buildScheduleForm(todayStr(), "", "baseball");
+  document.getElementById("modal-title").textContent = "📅 スケジュール追加";
+  document.getElementById("modal-desc").textContent = "日付（YYYY/MM/DD）と活動名を入力してください。";
+  document.getElementById("modal-body").innerHTML =
+    '<input id="sched-date" class="modal-input" type="text" placeholder="例：2025/04/10" value="' + todayStr() + '" />' +
+    '<input id="sched-name" class="modal-input" type="text" placeholder="活動名（例：4月練習、春合宿）" />';
   document.getElementById("modal-save-btn").textContent = "追加";
-  document.getElementById("modal-save-btn").style.display = "";
   document.getElementById("modal-del-btn").style.display = "none";
   document.getElementById("modal-overlay").classList.add("show");
   setTimeout(function(){ document.getElementById("sched-name").focus(); }, 100);
@@ -762,39 +489,22 @@ function openAddSchedule() {
 function openEditSchedule(s) {
   modalMode = "edit-schedule";
   editingScheduleId = s.id;
-  document.getElementById("modal-title").textContent = "✏️ スケジュール編集";
-  document.getElementById("modal-desc").textContent = "変更して「更新」を押してください。";
-  document.getElementById("modal-body").innerHTML = buildScheduleForm(isoToDisplay(normalizeDate(s.date)), s.name, s.category || "other");
+  document.getElementById("modal-title").textContent = "📅 スケジュール編集";
+  document.getElementById("modal-desc").textContent = "変更して「更新」を押してください。右クリックまたは長押しで編集できます。";
+  document.getElementById("modal-body").innerHTML =
+    '<input id="sched-date" class="modal-input" type="text" value="' + isoToDisplay(s.date) + '" />' +
+    '<input id="sched-name" class="modal-input" type="text" value="' + s.name.replace(/"/g,'&quot;') + '" />';
   document.getElementById("modal-save-btn").textContent = "更新";
-  document.getElementById("modal-save-btn").style.display = "";
   document.getElementById("modal-del-btn").style.display = "";
   document.getElementById("modal-overlay").classList.add("show");
-}
-
-function buildScheduleForm(date, name, category) {
-  var cats = [
-    { val: "baseball", label: "⚾ 野球" },
-    { val: "event",    label: "🎉 イベント" },
-    { val: "camp",     label: "🏕️ 合宿" },
-    { val: "other",    label: "📌 その他" }
-  ];
-  var options = cats.map(function(c){
-    return '<option value="' + c.val + '"' + (c.val === category ? ' selected' : '') + '>' + c.label + '</option>';
-  }).join("");
-  return '<label class="modal-label">日付（YYYY/MM/DD）</label>' +
-    '<input id="sched-date" class="modal-input" type="text" placeholder="例：2026/04/10" value="' + escHtml(date) + '" />' +
-    '<label class="modal-label">カテゴリ</label>' +
-    '<select id="sched-cat" class="modal-select">' + options + '</select>' +
-    '<label class="modal-label">活動名</label>' +
-    '<input id="sched-name" class="modal-input" type="text" placeholder="活動名（例：4月練習、春合宿）" value="' + escHtml(name) + '" />';
 }
 
 function deleteScheduleItem() {
   if (!confirm("このスケジュールを削除しますか？")) return;
   var id = editingScheduleId;
-  schedules = schedules.filter(function(s){ return s.id !== id; });
+  schedules = schedules.filter(function(s){return s.id !== id;});
   localStorage.setItem("schedules", JSON.stringify(schedules));
-  renderSchedules(); renderCalendar(); renderNextEvents(); closeModal();
+  renderSchedules(); closeModal();
   postViaForm({action:"deleteSchedule", id:id}, null);
 }
 
@@ -803,152 +513,35 @@ function openSettings() {
   modalMode = "settings";
   document.getElementById("modal-title").textContent = "⚙️ スプレッドシート連携";
   document.getElementById("modal-desc").textContent = "現在のGAS URL（変更する場合のみ編集してください）";
-  document.getElementById("modal-body").innerHTML = '<input id="gas-url-input" class="modal-input" type="text" value="' + escHtml(GAS_URL) + '" />';
+  document.getElementById("modal-body").innerHTML = '<input id="gas-url-input" class="modal-input" type="text" value="' + GAS_URL + '" />';
   document.getElementById("modal-save-btn").textContent = "閉じる";
-  document.getElementById("modal-save-btn").style.display = "";
   document.getElementById("modal-del-btn").style.display = "none";
   document.getElementById("modal-overlay").classList.add("show");
 }
-
-function closeModal() {
-  document.getElementById("modal-overlay").classList.remove("show");
-  document.getElementById("modal-save-btn").style.display = "";
-}
+function closeModal() { document.getElementById("modal-overlay").classList.remove("show"); }
 
 function saveModal() {
   if (modalMode === "settings") {
     closeModal();
-  } else if (modalMode === "add-schedule" || modalMode === "edit-schedule") {
+  } else if (modalMode === "add-schedule") {
     var date = parseDate(document.getElementById("sched-date").value);
     var name = document.getElementById("sched-name").value.trim();
-    var cat  = document.getElementById("sched-cat").value;
-    if (!date || !name) { alert("日付はYYYY/MM/DD形式で入力し、活動名も入力してください"); return; }
-    if (modalMode === "add-schedule") {
-      var newS = { id: String(Date.now()), date: date, name: name, category: cat };
-      schedules.push(newS);
-      localStorage.setItem("schedules", JSON.stringify(schedules));
-      renderSchedules(); renderCalendar(); renderNextEvents(); closeModal();
-      postViaForm({action:"addSchedule", schedule:newS}, null);
-    } else {
-      var s = schedules.find(function(x){ return x.id === editingScheduleId; });
-      if (s) { s.date = date; s.name = name; s.category = cat; }
-      localStorage.setItem("schedules", JSON.stringify(schedules));
-      renderSchedules(); renderCalendar(); renderNextEvents(); closeModal();
-      postViaForm({action:"updateSchedule", schedule:s}, null);
-    }
+    if (!date || !name) { alert("日付はYYYY/MM/DD形式で入力してください"); return; }
+    var newS = {id: String(Date.now()), date: date, name: name};
+    schedules.push(newS);
+    localStorage.setItem("schedules", JSON.stringify(schedules));
+    renderSchedules(); closeModal();
+    postViaForm({action:"addSchedule", schedule:newS}, null);
+  } else if (modalMode === "edit-schedule") {
+    var date = parseDate(document.getElementById("sched-date").value);
+    var name = document.getElementById("sched-name").value.trim();
+    if (!date || !name) { alert("日付はYYYY/MM/DD形式で入力してください"); return; }
+    var s = schedules.find(function(x){return x.id===editingScheduleId;});
+    if (s) { s.date = date; s.name = name; }
+    localStorage.setItem("schedules", JSON.stringify(schedules));
+    renderSchedules(); closeModal();
+    postViaForm({action:"updateSchedule", schedule:s}, null);
   }
-}
-
-// ===== 出欠メンバー管理 =====
-function saveMembers() { localStorage.setItem("members", JSON.stringify(members)); }
-
-function renderGrid() {
-  var grid = document.getElementById("members-grid");
-  grid.innerHTML = "";
-  for (var i = 0; i < members.length; i++) {
-    (function(m) {
-      var isOn = attended.has(m.id);
-      var card = document.createElement("div");
-      card.className = "member-card" + (isOn ? " on" : "");
-      card.id = "card-" + m.id;
-      card.draggable = true;
-
-      var delBtn = document.createElement("button");
-      delBtn.className = "member-del"; delBtn.textContent = "✕";
-      delBtn.onclick = function(e){ e.stopPropagation(); removeMember(m.id); };
-
-      var nameDiv = document.createElement("div");
-      nameDiv.className = "member-name"; nameDiv.textContent = m.name;
-      nameDiv.onclick = function(e){ e.stopPropagation(); startEdit(m.id); };
-
-      var toggleBtn = document.createElement("button");
-      toggleBtn.className = "member-toggle";
-      toggleBtn.textContent = isOn ? "✓ 出席" : "欠席";
-      toggleBtn.onclick = function(e){ e.stopPropagation(); toggleMember(m.id); };
-
-      card.appendChild(delBtn); card.appendChild(nameDiv); card.appendChild(toggleBtn);
-
-      card.ondragstart = function(e){ dragSrcId = m.id; card.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; };
-      card.ondragend   = function(){ card.classList.remove("dragging"); document.querySelectorAll(".drag-over").forEach(function(c){c.classList.remove("drag-over");}); };
-      card.ondragover  = function(e){ e.preventDefault(); card.classList.add("drag-over"); };
-      card.ondragleave = function(){ card.classList.remove("drag-over"); };
-      card.ondrop = function(e){
-        e.preventDefault();
-        var si = members.findIndex(function(x){ return x.id === dragSrcId; });
-        var di = members.findIndex(function(x){ return x.id === m.id; });
-        if (si === di) return;
-        var item = members.splice(si, 1)[0];
-        members.splice(di, 0, item);
-        saveMembers(); renderGrid();
-      };
-      grid.appendChild(card);
-    })(members[i]);
-  }
-}
-
-function updateHeader() {
-  var count = attended.size, total = members.length;
-  var pct = total === 0 ? 0 : Math.round(count / total * 100);
-  document.getElementById("count-num").textContent = count;
-  document.getElementById("count-total").textContent = "/ " + total + "名";
-  document.getElementById("progress-fill").style.width = pct + "%";
-  document.getElementById("pct-text").textContent = pct + "%";
-  document.getElementById("absent-text").textContent = total - count;
-}
-
-function toggleMember(id) {
-  if (attended.has(id)) attended.delete(id); else attended.add(id);
-  var card = document.getElementById("card-" + id);
-  card.classList.toggle("on", attended.has(id));
-  card.querySelector(".member-toggle").textContent = attended.has(id) ? "✓ 出席" : "欠席";
-  updateHeader();
-}
-
-function removeMember(id) {
-  members = members.filter(function(m){ return m.id !== id; });
-  attended.delete(id);
-  saveMembers(); renderGrid(); updateHeader();
-}
-
-function startEdit(id) {
-  var nameEl = document.querySelector("#card-" + id + " .member-name");
-  if (!nameEl) return;
-  var member = members.find(function(m){ return m.id === id; });
-  if (!member) return;
-  var input = document.createElement("input");
-  input.className = "member-name-input"; input.value = member.name;
-  nameEl.replaceWith(input); input.focus();
-  function save() {
-    var n = input.value.trim();
-    if (n) { member.name = n; saveMembers(); }
-    var div = document.createElement("div");
-    div.className = "member-name"; div.textContent = member.name;
-    div.onclick = function(e){ e.stopPropagation(); startEdit(id); };
-    input.replaceWith(div);
-  }
-  input.onblur = save;
-  input.onkeydown = function(e){ if(e.key==="Enter") input.blur(); };
-}
-
-function resetAttendance() { attended.clear(); lastSessionId = null; currentEventDate = null; hideResult(); renderGrid(); updateHeader(); }
-
-function showAddForm() {
-  document.getElementById("add-form").classList.add("show");
-  document.getElementById("add-btn").style.display = "none";
-  document.getElementById("reset-btn").style.display = "none";
-  document.getElementById("new-name-input").focus();
-}
-function cancelAdd() {
-  document.getElementById("add-form").classList.remove("show");
-  document.getElementById("add-btn").style.display = "";
-  document.getElementById("reset-btn").style.display = "";
-  document.getElementById("new-name-input").value = "";
-}
-function confirmAdd() {
-  var name = document.getElementById("new-name-input").value.trim();
-  if (!name) return;
-  members.push({id: Date.now(), name: name});
-  saveMembers(); renderGrid(); updateHeader(); cancelAdd();
 }
 
 // ===== 送受信 =====
@@ -966,11 +559,17 @@ function hideResult() {
 
 function postViaForm(payload, onDone) {
   var form = document.createElement("form");
-  form.method = "POST"; form.action = GAS_URL; form.target = "gas-iframe";
+  form.method = "POST";
+  form.action = GAS_URL;
+  form.target = "gas-iframe";
   var input = document.createElement("input");
-  input.type = "hidden"; input.name = "payload"; input.value = JSON.stringify(payload);
-  form.appendChild(input); document.body.appendChild(form);
-  document.getElementById("gas-iframe").onload = function(){
+  input.type = "hidden";
+  input.name = "payload";
+  input.value = JSON.stringify(payload);
+  form.appendChild(input);
+  document.body.appendChild(form);
+  var iframe = document.getElementById("gas-iframe");
+  iframe.onload = function() {
     document.body.removeChild(form);
     if (onDone) onDone();
   };
@@ -982,12 +581,13 @@ function sendToSheet() {
   btn.disabled = true; btn.textContent = "送信中...";
   var sessionId = String(Date.now());
   var payload = {
-    action: "record", sessionId: sessionId,
+    action: "record",
+    sessionId: sessionId,
     session: document.getElementById("session-label").value,
     eventDate: currentEventDate,
     members: members.map(function(m){ return {name: m.name, attended: attended.has(m.id)}; })
   };
-  postViaForm(payload, function(){
+  postViaForm(payload, function() {
     lastSessionId = sessionId;
     btn.disabled = false; btn.textContent = "📊 スプレッドシートに記録する";
     showResult(true, "✓ スプレッドシートに記録しました！", true);
@@ -999,7 +599,7 @@ function undoRecord() {
   var btn = document.getElementById("undo-btn");
   btn.textContent = "取消中..."; btn.disabled = true;
   var sid = lastSessionId;
-  postViaForm({action:"undo", sessionId:sid}, function(){
+  postViaForm({action:"undo", sessionId:sid}, function() {
     lastSessionId = null;
     btn.textContent = "↩ 取り消す"; btn.disabled = false;
     showResult(true, "↩ 直前の記録を取り消しました", false);
@@ -1008,5 +608,6 @@ function undoRecord() {
 
 init();
 </script>
+<iframe id="gas-iframe" name="gas-iframe" style="display:none;"></iframe>
 </body>
 </html>
